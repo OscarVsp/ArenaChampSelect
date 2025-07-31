@@ -134,7 +134,7 @@ export async function load() {
     }
 
     socket.observe("/lol-champ-select/v1/session", async (data) => {
-        console.debug(log_prefix+"Session change detected")
+        console.debug(log_prefix+"Champ select session change detected")
         if (data["eventType"] == "Create"){
             console.debug(log_prefix+"New champ select detected")
             const res = await fetch('/lol-gameflow/v1/session', {method: 'GET',})
@@ -151,6 +151,90 @@ export async function load() {
             }
         }
     });
+
+    socket.observe("/lol-lobby/v2/lobby", async (data) => {
+        console.debug(log_prefix+"Lobby change detected")
+        if (data["uri"] == "/lol-lobby/v2/lobby" && (data["eventType"] == "Create" || data["eventType"] == "Update") ){
+            const gameConfig = data?.data?.gameConfig
+            const gameMode = gameConfig?.gameMode
+
+            if (gameMode == "CHERRY"){  
+                console.log(log_prefix+"Arena Lobby detected")
+
+                const lobbyHeader = document.querySelector('.max-level-completed');
+
+                if (lobbyHeader == null){
+                    console.debug(log_prefix+"Unable to find the lobby header content")
+                    return
+                }
+
+                const malLevelText = lobbyHeader.querySelector('.max-level-completed-text')
+
+
+                let existingContainer = lobbyHeader.querySelector('.arena-god-container');
+
+                if (existingContainer != null){
+                    console.debug(log_prefix+"arena god container already existing")
+                    return
+                }
+
+
+                challengeData = await getArenaChallengeData()
+
+                existingContainer = lobbyHeader.querySelector('.arena-god-container');
+
+                if (existingContainer != null){
+                    console.debug(log_prefix+"arena god container already existing")
+                    return
+                }
+
+
+                console.debug(log_prefix+"Adding arena god stat to lobby header")
+
+                //TODO: arena god achieved
+
+                const arenaGodContainer = document.createElement("div")
+                arenaGodContainer.className = "arena-god-container"
+                arenaGodContainer.style.display = 'flex'
+                arenaGodContainer.style.flexDirection = 'row'
+                arenaGodContainer.style.alignItems = 'center'
+                arenaGodContainer.style.marginLeft = 'auto'
+                arenaGodContainer.style.marginRight = '10px'    
+                
+
+                const arenaGodIcon = document.createElement('img')
+                arenaGodIcon.src = "/fe/lol-static-assets/images/challenges-shared/icon_reward_title.svg"
+                arenaGodIcon.class="challenge-item-milestone-icon"
+                arenaGodIcon.style.marginRight = '2px'
+                arenaGodContainer.appendChild(arenaGodIcon)
+
+                
+
+                const arenaGodStat = document.createElement('div');
+                arenaGodStat.id = "ArenaGodStat"
+                arenaGodStat.className = "arena-god-stat"
+                arenaGodStat.innerHTML = "Arena God "+challengeData.top1.completedIds.length.toString()+"/100"
+                arenaGodStat.style.color = '#c8aa6e'
+                arenaGodStat.style.font = malLevelText.style.font
+                arenaGodStat.style.fontSize = '14px'
+                arenaGodStat.style.fontWeight = '600'
+                arenaGodStat.style.letterSpacing = '.025em'
+
+                
+                arenaGodContainer.appendChild(arenaGodStat)
+                lobbyHeader.appendChild(arenaGodContainer);
+                
+            } else {
+                console.debug(log_prefix+"Non-arena lobby detected")
+                const existingContainer = document.querySelector('.arena-god-container');
+
+                if (existingContainer != null){
+                    console.debug(log_prefix+"removing arena god container")
+                    existingContainer.remove()
+                }
+            }
+        }
+    })
 
     console.debug(log_prefix+"Loaded")
 }
