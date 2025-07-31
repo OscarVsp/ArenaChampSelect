@@ -1,6 +1,5 @@
-
-const spark = 'https://raw.githubusercontent.com/OscarVsp/ArenaChampSelect/refs/heads/main/assets/spark.svg'
-const trophy = 'https://raw.githubusercontent.com/OscarVsp/ArenaChampSelect/refs/heads/main/assets/trophy.svg'
+import spark from './assets/spark.svg'
+import trophy from './assets/trophy.svg'
 
 const log_prefix = "[ArenaChampSelect] "
 var socket;
