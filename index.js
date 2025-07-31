@@ -1,5 +1,5 @@
-import spark from 'https://cdn.jsdelivr.net/gh/OscarVsp/ArenaChampSelect@main/spark.svg'
-import trophy from 'https://cdn.jsdelivr.net/gh/OscarVsp/ArenaChampSelect@main/trophy.svg'
+import spark from './spark.svg'
+import trophy from './trophy.svg'
 
 const log_prefix = "[ArenaChampSelect] "
 var socket;
